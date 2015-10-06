@@ -21,5 +21,5 @@ _Note: The scripts are compatible with all GNU/Linux distributions._
 
 ### External links:
 
-[Mozilla official website](https://www.mozilla.org/)
-[Mozilla HTTP server files](http://archive.mozilla.org/pub/)
+  * [Mozilla official website](https://www.mozilla.org/)
+  * [Mozilla HTTP server files](http://archive.mozilla.org/pub/)
