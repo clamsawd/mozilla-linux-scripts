@@ -1,10 +1,10 @@
 #!/bin/bash
  
 # Script to install Firefox on GNU/Linux
-# Created by Quique (quuiqueee@gmail.com)
-# Version 1.0
+# Created by clamsawd (clamsawd@openmailbox.org)
+# Version 2.0
 # Licensed by GPL v.2
-# Last update: 05-09-2014
+# Last update: 24-08-2015
 # --------------------------------------
  
   function printf(){
@@ -57,83 +57,48 @@ KERNEL=$(uname -s)
  
  # Install Firefox using 'tar' command and
  # initialize the 'create_firefox_icon' function.
- function install_firefox_tar(){
+ function install_firefox(){
 
    printf ""
    printf " <-Downloading Mozilla Firefox->"
    cd /tmp/
-   $APP_DOWNLOAD $SERVER
+   if [ "$APP_DOWNLOAD" == "curl" ] ; then
+     $APP_DOWNLOAD $SERVER > firefox-$VERSION
+   else
+     $APP_DOWNLOAD $SERVER
+   fi
    printf " <-Installing Mozilla Firefox->"
-   tar jxvf firefox-$VERSION.tar.bz2 -C /opt/
+   tar jxvf firefox-$VERSION -C /opt/
    rm -rf /usr/bin/firefox
    ln -s /opt/firefox/firefox /usr/bin/firefox
    chmod 755 -R /opt/firefox/
-   rm -rf /tmp/firefox-$VERSION.tar.bz2
+   rm -rf /tmp/firefox-$VERSION
    create_firefox_icon
- }
- 
- # Install Firefox using '7za' command (p7zip) and
- # initialize the 'create_firefox_icon' function.
- function install_firefox_7za(){
- 
-   printf ""
-   printf " <-Downloading Mozilla Firefox->"
-   cd /tmp/
-   $APP_DOWNLOAD $SERVER
-   printf " <-Installing Mozilla Firefox->"
-   7za x firefox-$VERSION.tar.bz2
-   7za x firefox-$VERSION.tar -y -o/opt/
-   rm -rf /usr/bin/firefox
-   ln -s /opt/firefox/firefox /usr/bin/firefox
-   chmod 755 -R /opt/firefox/
-   rm -rf /tmp/firefox-$VERSION.tar.bz2
-   rm -rf /tmp/firefox-$VERSION.tar
-   create_firefox_icon
- }
- 
- # Check if '7za' ('p7zip' package) is installed,
- # define the variable 'UNPACK' and initialize the
- # 'step5_install_firefox' function.
- function check_7za_command_on_system(){
-	 
-  7za --help > /dev/null
-  if [ "$?" -eq 0 ] ; then
-    UNPACK=7za
-    step5_install_firefox
-  else
-    UNPACK=tar
-    step5_install_firefox
-  fi 
  }
  
  # Define the complete URL of selected firefox package, show
  # the selected previous options to confirm and will initialize
- # the install ('install_firefox_7za' or 'install_firefox_tar' function).
+ # the install ('install_firefox' function).
  function step5_install_firefox(){
  
- SERVER=ftp://ftp.mozilla.org/pub/firefox/releases/$VERSION/$ARCH/$LANGUAGE/firefox-$VERSION.tar.bz2
+ SERVER=http://archive.mozilla.org/pub/firefox/releases/$RELEASE/$ARCH/$LANGUAGE/firefox-$VERSION
  
  clear
  printf ""
  printf "[Step 5/5] Check your selected installation:"
  printf ""
  printf "Install: Mozilla Firefox"
- printf "Version: $VERSION"
- printf "Package: firefox-$VERSION.tar.bz2"
+ printf "Package: firefox-$VERSION"
  printf "Language: $LANGUAGE"
  printf "Arch: $ARCH"
+ printf "Directory: /opt/firefox/"
  printf ""
- printf "Apps: $NAME_APP (download) , $UNPACK (unpack) "
+ printf "Apps: $NAME_APP (download) , tar (unpack) "
  printf ""
  printf -n "(default: y) Is correct (y/n/q); " ; read VAREND
  
   if [ "${VAREND:-NO_VALUE}" == "NO_VALUE" -o "$VAREND" == "yes" -o "$VAREND" == "y" ] ; then
-   if [ "$UNPACK" == "7za" ]; then
-     install_firefox_7za
-   else
-     install_firefox_tar
-   fi
-  
+     install_firefox
   elif [ "$VAREND" == "no" -o "$VAREND" == "n" ] ; then
        get_list_versions
        
@@ -251,7 +216,7 @@ function check_other_installs_on_system(){
  }
 
  # Define the variable 'APP_DOWNLOAD' and
- # initialize the 'check_7za_command_on_system'
+ # initialize the 'step5_install_firefox'
  # function.
  function step4_choose_app_download(){
    
@@ -264,6 +229,7 @@ function check_other_installs_on_system(){
    printf "(1) - wget ($WGET)"
    printf "(2) - aria2c ($ARIA2C)"
    printf "(3) - axel ($AXEL)"
+   printf "(4) - curl (Available)"
    printf ""
    printf "(q) - quit"
    printf ""
@@ -277,7 +243,7 @@ function check_other_installs_on_system(){
      if [ "$WGET" == "Available" ]; then
          APP_DOWNLOAD='wget -c'
          NAME_APP='wget'
-         check_7za_command_on_system
+         step5_install_firefox
      else
      clear
      printf ""
@@ -295,7 +261,7 @@ function check_other_installs_on_system(){
      if [ "$ARIA2C" == "Available" ]; then
          APP_DOWNLOAD='aria2c --check-certificate=false'
          NAME_APP='aria2c'
-         check_7za_command_on_system
+         step5_install_firefox
      else
      clear
      printf ""
@@ -313,7 +279,7 @@ function check_other_installs_on_system(){
      if [ "$AXEL" == "Available" ]; then
          APP_DOWNLOAD='axel'
          NAME_APP='axel'
-         check_7za_command_on_system
+         step5_install_firefox
      else
      clear
      printf ""
@@ -323,6 +289,12 @@ function check_other_installs_on_system(){
      read not
      step4_choose_app_download
      fi
+
+   elif [ "$APP" == "4" -o "$APP" == "curl" ] ; then
+   
+         APP_DOWNLOAD='curl'
+         NAME_APP='curl'
+         step5_install_firefox
      
    elif [ "$APP" == "q" -o "$APP" == "quit" ] ; then
          exit
@@ -331,7 +303,7 @@ function check_other_installs_on_system(){
      if [ "$WGET" == "Available" ]; then
          APP_DOWNLOAD='wget -c'
          NAME_APP='wget'
-         check_7za_command_on_system
+         step5_install_firefox
      else
      clear
      printf ""
@@ -475,8 +447,7 @@ function check_other_installs_on_system(){
 }
 
  # Get the list of available firefox versions using 'curl',
- # define the variable 'VER' and initialize the 'step2_choose_language'
- # function.
+ # and initialize the 'step2_choose_language' function.
  
  function get_list_versions() {
  
@@ -484,9 +455,13 @@ function check_other_installs_on_system(){
    printf ""
    printf "Getting information of available versions, please wait.."
    printf ""
-   TMP_FILE=/tmp/moz_versions
-   FTP_FIREFOX=ftp://ftp.mozilla.org/pub/firefox/releases
-      curl $FTP_FIREFOX/ > $TMP_FILE
+   TMP_FILE_STABLE=/tmp/moz_versions_st
+   TMP_FILE_BETA=/tmp/moz_versions_bt
+   TMP_FILE_ESR=/tmp/moz_versions_esr
+   HTTP_FIREFOX=http://archive.mozilla.org/pub/firefox/releases
+      curl "$HTTP_FIREFOX/latest/linux-x86_64/en-US/" | grep "tar.bz2" | cut -d "-" -f 3 | cut -d "<" -f 1 > $TMP_FILE_STABLE
+      curl "$HTTP_FIREFOX/latest-beta/linux-x86_64/en-US/" | grep "tar.bz2" | cut -d "-" -f 3 | cut -d "<" -f 1 > $TMP_FILE_BETA
+      curl "$HTTP_FIREFOX/latest-esr/linux-x86_64/en-US/" | grep "tar.bz2" | cut -d "-" -f 3 | cut -d "<" -f 1 > $TMP_FILE_ESR
        error=$?
        if [ $? -eq 0 ] ; then
          printf "OK" > /dev/null
@@ -503,11 +478,10 @@ function check_other_installs_on_system(){
  
  function step1_choose_version(){
 	  
-   FTP_VERSIONS=`cat $TMP_FILE | grep "latest" | cut -d ">" -f 2 | cut -d " " -f 2`
-   FIREFOX_STABLE=`echo $FTP_VERSIONS | cut -d " " -f 1`
-   FIREFOX_BETA=`cat $TMP_FILE | grep "latest-beta" | cut -d ">" -f 2 | cut -d " " -f 2`
-   FIREFOX_ESR=`cat $TMP_FILE | grep "latest-esr" | cut -d ">" -f 2 | cut -d " " -f 2`
-   DEFAULT=`echo $FTP_VERSIONS | cut -d " " -f 1`
+   FIREFOX_STABLE=`cat $TMP_FILE_STABLE`
+   FIREFOX_BETA=`cat $TMP_FILE_BETA`
+   FIREFOX_ESR=`cat $TMP_FILE_ESR`
+   DEFAULT=`cat $TMP_FILE_STABLE`
 	  
    clear
    printf ""
@@ -515,28 +489,32 @@ function check_other_installs_on_system(){
    printf ""
    printf "Available Versions:"
    printf ""
-   printf "(1) - $FIREFOX_ESR (ESR)"
-   printf "(2) - $FIREFOX_STABLE (stable)"
-   printf "(3) - $FIREFOX_BETA (beta)"
+   printf "(1) - firefox-$FIREFOX_ESR (ESR)"
+   printf "(2) - firefox-$FIREFOX_STABLE (stable)"
+   printf "(3) - firefox-$FIREFOX_BETA (beta)"
    printf ""
    printf "(q) - quit"
    printf ""
-   printf -n "(Default: $DEFAULT) Choose an option; " ; read VER
+   printf -n "(Default: firefox-$DEFAULT) Choose an option; " ; read VER
    
    if [ "$VER" == "1" -o "$VER" == "ESR" ] ; then
    VERSION=$FIREFOX_ESR
+   RELEASE="latest-esr"
    step2_choose_language
    
    elif [ "$VER" == "2" -o "$VER" == "stable" ] ; then
    VERSION=$FIREFOX_STABLE
+   RELEASE="latest"
    step2_choose_language
    
    elif [ "$VER" == "3" -o "$VER" == "beta" ] ; then
    VERSION=$FIREFOX_BETA
+   RELEASE="latest-beta"
    step2_choose_language
    
    elif [ "${VER:-NO_VALUE}" == "NO_VALUE" ] ; then
    VERSION=$DEFAULT
+   RELEASE="latest"
    step2_choose_language
    
    elif [ "$VER" == "q" -o "$VER" == "quit" ] ; then
