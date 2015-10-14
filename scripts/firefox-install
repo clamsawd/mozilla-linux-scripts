@@ -2,19 +2,11 @@
  
 # Script to install Firefox on GNU/Linux
 # Created by clamsawd (clamsawd@openmailbox.org)
-# Version 2.0
+# Version 2.1
 # Licensed by GPL v.2
-# Last update: 24-08-2015
+# Last update: 14-10-2015
 # --------------------------------------
- 
-  function printf(){
-  echo "$1" "$2"
-  }
 
-  function textprint(){
-  echo "$1"
-  }
- 
 # Check if 'user' is 'root'
 user=$(whoami)
  if [ "$user" == "root" ] ; then
@@ -23,7 +15,7 @@ user=$(whoami)
      echo "You must be root!"
      exit 0
  fi
- 
+
 # Detect "kernel" name
 KERNEL=$(uname -s)
  if   [ $KERNEL == "Linux" ]; then
@@ -32,42 +24,42 @@ KERNEL=$(uname -s)
        echo "Unsupported OS ($KERNEL)"
        exit 0
  fi
- 
+
  # Create Mozilla Firefox shortcut after of install it.
  function create_firefox_icon(){
-	 
-  textprint "[Desktop Entry]" > /usr/share/applications/firefox.desktop
-  #textprint "Encoding=UTF-8" >> /usr/share/applications/firefox.desktop
-  textprint "Name=Mozilla Firefox" >> /usr/share/applications/firefox.desktop
-  textprint "Comment=Browse the World Wide Web" >> /usr/share/applications/firefox.desktop
-  textprint "GenericName=Web Browser" >> /usr/share/applications/firefox.desktop
-  textprint "X-GNOME-FullName=Mozilla Firefox" >> /usr/share/applications/firefox.desktop
-  textprint "Exec=firefox %u" >> /usr/share/applications/firefox.desktop
-  textprint "Terminal=false" >> /usr/share/applications/firefox.desktop
-  textprint "X-MultipleArgs=false" >> /usr/share/applications/firefox.desktop
-  textprint "Type=Application" >> /usr/share/applications/firefox.desktop
-  textprint "Icon=/opt/firefox/browser/icons/mozicon128.png" >> /usr/share/applications/firefox.desktop
-  textprint "Categories=Network;WebBrowser;" >> /usr/share/applications/firefox.desktop
-  #textprint "StartupWMClass=Firefox-bin" >> /usr/share/applications/firefox.desktop
-  textprint "StartupNotify=true" >> /usr/share/applications/firefox.desktop
+
+  echo "[Desktop Entry]" > /usr/share/applications/firefox.desktop
+  #echo "Encoding=UTF-8" >> /usr/share/applications/firefox.desktop
+  echo "Name=Mozilla Firefox" >> /usr/share/applications/firefox.desktop
+  echo "Comment=Browse the World Wide Web" >> /usr/share/applications/firefox.desktop
+  echo "GenericName=Web Browser" >> /usr/share/applications/firefox.desktop
+  echo "X-GNOME-FullName=Mozilla Firefox" >> /usr/share/applications/firefox.desktop
+  echo "Exec=firefox %u" >> /usr/share/applications/firefox.desktop
+  echo "Terminal=false" >> /usr/share/applications/firefox.desktop
+  echo "X-MultipleArgs=false" >> /usr/share/applications/firefox.desktop
+  echo "Type=Application" >> /usr/share/applications/firefox.desktop
+  echo "Icon=/opt/firefox/browser/icons/mozicon128.png" >> /usr/share/applications/firefox.desktop
+  echo "Categories=Network;WebBrowser;" >> /usr/share/applications/firefox.desktop
+  #echo "StartupWMClass=Firefox-bin" >> /usr/share/applications/firefox.desktop
+  echo "StartupNotify=true" >> /usr/share/applications/firefox.desktop
   chmod 755 /usr/share/applications/firefox.desktop
-  printf " <-Finished->"
-  exit 
+  echo " <-Finished->"
+  exit
  }
- 
+
  # Install Firefox using 'tar' command and
  # initialize the 'create_firefox_icon' function.
  function install_firefox(){
 
-   printf ""
-   printf " <-Downloading Mozilla Firefox->"
+   echo ""
+   echo " <-Downloading Mozilla Firefox->"
    cd /tmp/
    if [ "$APP_DOWNLOAD" == "curl" ] ; then
      $APP_DOWNLOAD $SERVER > firefox-$VERSION
    else
      $APP_DOWNLOAD $SERVER
    fi
-   printf " <-Installing Mozilla Firefox->"
+   echo " <-Installing Mozilla Firefox->"
    tar jxvf firefox-$VERSION -C /opt/
    rm -rf /usr/bin/firefox
    ln -s /opt/firefox/firefox /usr/bin/firefox
@@ -75,72 +67,72 @@ KERNEL=$(uname -s)
    rm -rf /tmp/firefox-$VERSION
    create_firefox_icon
  }
- 
+
  # Define the complete URL of selected firefox package, show
  # the selected previous options to confirm and will initialize
  # the install ('install_firefox' function).
  function step5_install_firefox(){
- 
+
  SERVER=http://archive.mozilla.org/pub/firefox/releases/$RELEASE/$ARCH/$LANGUAGE/firefox-$VERSION
- 
+
  clear
- printf ""
- printf "[Step 5/5] Check your selected installation:"
- printf ""
- printf "Install: Mozilla Firefox"
- printf "Package: firefox-$VERSION"
- printf "Language: $LANGUAGE"
- printf "Arch: $ARCH"
- printf "Directory: /opt/firefox/"
- printf ""
- printf "Apps: $NAME_APP (download) , tar (unpack) "
- printf ""
- printf -n "(default: y) Is correct (y/n/q); " ; read VAREND
- 
+ echo ""
+ echo "[Step 5/5] Check your selected installation:"
+ echo ""
+ echo "Install: Mozilla Firefox"
+ echo "Package: firefox-$VERSION"
+ echo "Language: $LANGUAGE"
+ echo "Arch: $ARCH"
+ echo "Directory: /opt/firefox/"
+ echo ""
+ echo "Apps: $NAME_APP (download) , tar (unpack) "
+ echo ""
+ echo -n "(default: y) Is correct (y/n/q); " ; read VAREND
+
   if [ "${VAREND:-NO_VALUE}" == "NO_VALUE" -o "$VAREND" == "yes" -o "$VAREND" == "y" ] ; then
      install_firefox
   elif [ "$VAREND" == "no" -o "$VAREND" == "n" ] ; then
        get_list_versions
-       
+
   elif [ "$VAREND" == "q" -o "$VAREND" == "quit" ] ; then
        exit
-       
+
   else
-     clear  
-     printf ""
-     printf "Invalid option, please, choose any available option"
-     printf ""
-     printf "Press 'ENTER' to return"
+     clear
+     echo ""
+     echo "Invalid option, please, choose any available option"
+     echo ""
+     echo -n "Press 'ENTER' to return "
      read yesorno
      step5_install_firefox
   fi
  }
 
- # Check if 'wget', 'aria2c' & 'axel' are installed, 
+ # Check if 'wget', 'aria2c' & 'axel' are installed,
  # define the corresponding variable and initialize the
  # 'step4_choose_app_download' function.
  function check_downloaders_on_system() {
-	
+
     wget --help > /dev/null
     if [ "$?" -eq 0 ] ; then
      WGET=Available
     else
      WGET='Not available'
     fi
-    
+
     aria2c --help > /dev/null
     if [ "$?" -eq 0 ] ; then
      ARIA2C=Available
     else
      ARIA2C='Not available'
-    fi  
+    fi
 
     axel --help > /dev/null
     if [ "$?" -eq 0 ] ; then
      AXEL=Available
     else
      AXEL='Not available'
-    fi 
+    fi
   step4_choose_app_download
 }
 
@@ -148,48 +140,48 @@ KERNEL=$(uname -s)
 # allows overwrite it, uninstall it or exit to cancel.
 # Initialize the 'step1_choose_version' function too.
 function check_other_installs_on_system(){
-	
+
 	if [ -d /opt/firefox/ ]; then
 	clear
-	printf ""
-	printf "Detected a previous installation of Firefox"
-	printf "Do you want to overwrite or uninstall the current version?"
-	printf ""
-	printf "(1) - overwrite"
-	printf "(2) - uninstall"
-	printf "(3) - quit (q)"
-	printf ""
-	printf -n "(Default: overwrite) Choose an option; " ; read INST
-	
+	echo ""
+	echo "Detected a previous installation of Firefox"
+	echo "Do you want to overwrite or uninstall the current version?"
+	echo ""
+	echo "(1) - overwrite"
+	echo "(2) - uninstall"
+	echo "(3) - quit (q)"
+	echo ""
+	echo -n "(Default: overwrite) Choose an option; " ; read INST
+
 	if [ "${INST:-NO_VALUE}" == "NO_VALUE" ] ; then
 	   get_list_versions
-	   
+
 	elif [ "$INST" == "1" -o "$INST" == "overwrite" ] ; then
 	   get_list_versions
-	   
+
 	elif [ "$INST" == "2" -o "$INST" == "uninstall" ] ; then
-	
+
 	     clear
-	     printf ""
-	     printf "Uninstalling Firefox, please wait..."
-	     printf ""
+	     echo ""
+	     echo "Uninstalling Firefox, please wait..."
+	     echo ""
 	     sleep 5
 	     rm -rf /usr/bin/firefox
 	     rm -rf /usr/share/applications/firefox.desktop
 	     rm -rf /opt/firefox/
-	     printf "Done!"
-	     printf ""
+	     echo "Done!"
+	     echo ""
 	     exit
-	     
+
 	elif [ "$INST" == "3" -o "$INST" == "quit" -o "$INST" == "q" ]; then
 	      exit
-	
+
 	else
-          clear  
-          printf ""
-          printf "Invalid option, please, choose any available option"
-          printf ""
-          printf "Press 'ENTER' to return"
+          clear
+          echo ""
+          echo "Invalid option, please, choose any available option"
+          echo ""
+          echo -n "Press 'ENTER' to return "
           read notoption
           check_other_installs_on_system
        fi
@@ -202,15 +194,15 @@ function check_other_installs_on_system(){
  # if it is not installed. Initialize the 'check_other_installs_on_system'
  # too.
  function check_curl_on_system(){
-	 
+
     curl --help > /dev/null
     if [ "$?" -eq 0 ] ; then
      check_other_installs_on_system
     else
      clear
-     printf ""
-     printf "Error: Need 'curl' installed on your system!"
-     printf ""
+     echo ""
+     echo "Error: Need 'curl' installed on your system!"
+     echo ""
      exit
     fi
  }
@@ -219,25 +211,25 @@ function check_other_installs_on_system(){
  # initialize the 'step5_install_firefox'
  # function.
  function step4_choose_app_download(){
-   
+
    clear
-   printf ""
-   printf "[ Step 4/5 (App to download) ]"
-   printf ""
-   printf "Available apps to download:"
-   printf ""
-   printf "(1) - wget ($WGET)"
-   printf "(2) - aria2c ($ARIA2C)"
-   printf "(3) - axel ($AXEL)"
-   printf "(4) - curl (Available)"
-   printf ""
-   printf "(q) - quit"
-   printf ""
+   echo ""
+   echo "[ Step 4/5 (App to download) ]"
+   echo ""
+   echo "Available apps to download:"
+   echo ""
+   echo "(1) - wget ($WGET)"
+   echo "(2) - aria2c ($ARIA2C)"
+   echo "(3) - axel ($AXEL)"
+   echo "(4) - curl (Available)"
+   echo ""
+   echo "(q) - quit"
+   echo ""
    APP=0
-   printf -n "(Default: wget) Choose an option; " ; read APP
-   
+   echo -n "(Default: curl) Choose an option; " ; read APP
+
    if [ "$APP" == "1" -o "$APP" == "wget" ] ; then
-   
+
      # Check if 'wget' is available using the variable
      # defined in 'check_downloaders_on_system' function.
      if [ "$WGET" == "Available" ]; then
@@ -246,16 +238,16 @@ function check_other_installs_on_system(){
          step5_install_firefox
      else
      clear
-     printf ""
-     printf "'wget' is not available in your system"
-     printf ""
-     printf "Press 'ENTER' to return"
+     echo ""
+     echo "'wget' is not available in your system"
+     echo ""
+     echo -n "Press 'ENTER' to return "
      read not
      step4_choose_app_download
      fi
-   
+
    elif [ "$APP" == "2" -o "$APP" == "aria2c" ] ; then
-   
+
      # Check if 'aria2c' is available using the variable
      # defined in 'check_downloaders_on_system' function.
      if [ "$ARIA2C" == "Available" ]; then
@@ -264,16 +256,16 @@ function check_other_installs_on_system(){
          step5_install_firefox
      else
      clear
-     printf ""
-     printf "'aria2c' is not available in your system"
-     printf ""
-     printf "Press 'ENTER' to return"
+     echo ""
+     echo "'aria2c' is not available in your system"
+     echo ""
+     echo -n "Press 'ENTER' to return "
      read not
      step4_choose_app_download
      fi
-     
+
    elif [ "$APP" == "3" -o "$APP" == "axel" ] ; then
-   
+
      # Check if 'axel' is available using the variable
      # defined in 'check_downloaders_on_system' function.
      if [ "$AXEL" == "Available" ]; then
@@ -282,44 +274,34 @@ function check_other_installs_on_system(){
          step5_install_firefox
      else
      clear
-     printf ""
-     printf "'axel' is not available in your system"
-     printf ""
-     printf "Press 'ENTER' to return"
+     echo ""
+     echo "'axel' is not available in your system"
+     echo ""
+     echo -n "Press 'ENTER' to return "
      read not
      step4_choose_app_download
      fi
 
    elif [ "$APP" == "4" -o "$APP" == "curl" ] ; then
-   
+
          APP_DOWNLOAD='curl'
          NAME_APP='curl'
          step5_install_firefox
-     
+
    elif [ "$APP" == "q" -o "$APP" == "quit" ] ; then
          exit
-   
-   elif [ "${APP:-NO_VALUE}" == "NO_VALUE" ] ; then
-     if [ "$WGET" == "Available" ]; then
-         APP_DOWNLOAD='wget -c'
-         NAME_APP='wget'
-         step5_install_firefox
-     else
-     clear
-     printf ""
-     printf "'wget' is not available in your system"
-     printf ""
-     printf "Press 'ENTER' to return"
-     read not
-     step4_choose_app_download
-     fi
 
+   elif [ "${APP:-NO_VALUE}" == "NO_VALUE" ] ; then
+
+         APP_DOWNLOAD='curl'
+         NAME_APP='curl'
+         step5_install_firefox
    else
-     clear  
-     printf ""
-     printf "Invalid option, please, choose any available app"
-     printf ""
-     printf "Press 'ENTER' to return"
+     clear
+     echo ""
+     echo "Invalid option, please, choose any available app"
+     echo ""
+     echo -n "Press 'ENTER' to return "
      read notapp
      step4_choose_app_download
   fi
@@ -328,22 +310,22 @@ function check_other_installs_on_system(){
  # Define the variable 'AR' and initialize
  # the 'check_downloaders_on_system' function.
  function step3_choose_arch(){
-   
+
    clear
-   printf ""
-   printf "[ Step 3/5 (Arch) ]"
-   printf ""
-   printf "Available Arch:"
-   printf ""
-   printf "(1) - 32 bits (linux-i686)"
-   printf "(2) - 64 bits (linux-x86_64)"
-   printf ""
-   printf "(q) - quit"
-   printf ""
-   printf -n "(Default: autodetect) Choose an option; " ; read AR
-   
+   echo ""
+   echo "[ Step 3/5 (Arch) ]"
+   echo ""
+   echo "Available Arch:"
+   echo ""
+   echo "(1) - 32 bits (linux-i686)"
+   echo "(2) - 64 bits (linux-x86_64)"
+   echo ""
+   echo "(q) - quit"
+   echo ""
+   echo -n "(Default: autodetect) Choose an option; " ; read AR
+
    if [ "${AR:-NO_VALUE}" == "NO_VALUE" ] ; then
-       
+
       # Detect the arch of the system if variable
       # 'AR' is empty.
       archs=`uname -m`
@@ -360,86 +342,86 @@ function check_other_installs_on_system(){
         echo "Unsupported Arquitecture ($archs)"
         exit 0
       esac
-      
+
    elif [ "$AR" == "1" -o "$AR" == "32" ] ; then
    ARCH=linux-i686
    check_downloaders_on_system
-   
+
    elif [ "$AR" == "2" -o "$AR" == "64" ] ; then
    ARCH=linux-x86_64
    check_downloaders_on_system
-   
+
    elif [ "$AR" == "q" -o "$AR" == "quit" ] ; then
          exit
-   
+
    else
-     clear  
-     printf ""
-     printf "Invalid option, please, choose any available arch"
-     printf ""
-     printf "Press 'ENTER' to return"
+     clear
+     echo ""
+     echo "Invalid option, please, choose any available arch"
+     echo ""
+     echo -n "Press 'ENTER' to return "
      read notarch
      step3_choose_arch
    fi
 }
- 
+
  # Define the variable 'LANGUAGE' and initialize the
  # 'step3_choose_arch' funtion.
  function step2_choose_language(){
-  
+
    FILE_LANGUAGES=/tmp/firefox-languages
    clear
-   printf ""
-   printf "[ Step 2/5 (Language) ]"
-   printf ""
-   printf "Available languages:"
-   printf ""
-   printf "[ach] [af] [an] [ar] [as] [ast] [be]" > $FILE_LANGUAGES
-   printf "[bg] [bn-BD] [bn-IN] [br] [bs] [ca]" >> $FILE_LANGUAGES
-   printf "[cs] [csb] [cy] [da] [de] [el] [en-GB]" >> $FILE_LANGUAGES
-   printf "[en-US] [en-ZA] [eo] [es-AR] [es-CL]" >> $FILE_LANGUAGES
-   printf "[es-ES] [es-MX] [et] [eu] [fa] [ff] [fi]" >> $FILE_LANGUAGES
-   printf "[fr] [fy-NL] [ga-IE] [gd] [gl] [gu-IN]" >> $FILE_LANGUAGES
-   printf "[he] [hi-IN] [hr] [hu] [hy-AM] [id]" >> $FILE_LANGUAGES
-   printf "[is] [it] [ja] [kk] [km] [kn] [ko] [ku]" >> $FILE_LANGUAGES
-   printf "[lij] [lt] [lv] [mai] [mk] [ml] [mr]" >> $FILE_LANGUAGES
-   printf "[ms] [nb-NO] [nl] [nn-NO] [or] [pa-IN]" >> $FILE_LANGUAGES
-   printf "[pl] [pt-BR] [pt-PT] [rm] [ro] [ru]" >> $FILE_LANGUAGES
-   printf "[si] [sk] [sl] [son] [sq] [sr] [sv-SE]" >> $FILE_LANGUAGES
-   printf "[sw] [ta] [te] [th] [tr] [uk] [vi] [xh]" >> $FILE_LANGUAGES
-   printf "[xpi] [zh-CN] [zh-TW] [zu]" >> $FILE_LANGUAGES
+   echo ""
+   echo "[ Step 2/5 (Language) ]"
+   echo ""
+   echo "Available languages:"
+   echo ""
+   echo "[ach] [af] [an] [ar] [as] [ast] [be]" > $FILE_LANGUAGES
+   echo "[bg] [bn-BD] [bn-IN] [br] [bs] [ca]" >> $FILE_LANGUAGES
+   echo "[cs] [csb] [cy] [da] [de] [el] [en-GB]" >> $FILE_LANGUAGES
+   echo "[en-US] [en-ZA] [eo] [es-AR] [es-CL]" >> $FILE_LANGUAGES
+   echo "[es-ES] [es-MX] [et] [eu] [fa] [ff] [fi]" >> $FILE_LANGUAGES
+   echo "[fr] [fy-NL] [ga-IE] [gd] [gl] [gu-IN]" >> $FILE_LANGUAGES
+   echo "[he] [hi-IN] [hr] [hu] [hy-AM] [id]" >> $FILE_LANGUAGES
+   echo "[is] [it] [ja] [kk] [km] [kn] [ko] [ku]" >> $FILE_LANGUAGES
+   echo "[lij] [lt] [lv] [mai] [mk] [ml] [mr]" >> $FILE_LANGUAGES
+   echo "[ms] [nb-NO] [nl] [nn-NO] [or] [pa-IN]" >> $FILE_LANGUAGES
+   echo "[pl] [pt-BR] [pt-PT] [rm] [ro] [ru]" >> $FILE_LANGUAGES
+   echo "[si] [sk] [sl] [son] [sq] [sr] [sv-SE]" >> $FILE_LANGUAGES
+   echo "[sw] [ta] [te] [th] [tr] [uk] [vi] [xh]" >> $FILE_LANGUAGES
+   echo "[xpi] [zh-CN] [zh-TW] [zu]" >> $FILE_LANGUAGES
    cat $FILE_LANGUAGES
-   printf ""
-   printf -n "(Default: en-US) Type the language; " ; read LANG
+   echo ""
+   echo -n "(Default: en-US) Type the language; " ; read LANG
    COUNT=1
-   
+
    # Check if the variable 'LANG' is empty.
    if [ "${LANG:-NO_VALUE}" != "NO_VALUE" ] ; then
-   
+
      # Check if the variable 'LANG' is valid.
      while [ $COUNT -le 10 ]; do
-   
+
         LANGUAGE_VAR=`cat $FILE_LANGUAGES | grep $LANG | cut -d "[" -f $COUNT | cut -d "]" -f 1`
-    
+
         if [ "$LANGUAGE_VAR" == "$LANG" ]; then
-     
+
             LANGUAGE=$LANG
             step3_choose_arch
-       
-        else  
-   
+
+        else
+
         COUNT=`expr $COUNT + 1`
         fi
      done
-   
-     clear  
-     printf ""
-     printf "Language '$LANG' is not valid, please, type any available language"
-     printf ""
-     printf "Press 'ENTER' to return"
+
+     clear
+     echo ""
+     echo "Language '$LANG' is not valid, please, type any available language"
+     echo ""
+     echo -n "Press 'ENTER' to return "
      read notlang
      step2_choose_language
-     
+
    else
      LANGUAGE=en-US
      step3_choose_arch
@@ -448,13 +430,13 @@ function check_other_installs_on_system(){
 
  # Get the list of available firefox versions using 'curl',
  # and initialize the 'step2_choose_language' function.
- 
+
  function get_list_versions() {
- 
-   clear 
-   printf ""
-   printf "Getting information of available versions, please wait.."
-   printf ""
+
+   clear
+   echo ""
+   echo "Getting information of available versions, please wait.."
+   echo ""
    TMP_FILE_STABLE=/tmp/moz_versions_st
    TMP_FILE_BETA=/tmp/moz_versions_bt
    TMP_FILE_ESR=/tmp/moz_versions_esr
@@ -464,68 +446,68 @@ function check_other_installs_on_system(){
       curl "$HTTP_FIREFOX/latest-esr/linux-x86_64/en-US/" | grep "tar.bz2" | cut -d "-" -f 3 | cut -d "<" -f 1 > $TMP_FILE_ESR
        error=$?
        if [ $? -eq 0 ] ; then
-         printf "OK" > /dev/null
+         echo "OK" > /dev/null
          step1_choose_version
        else
          clear
-         printf ""
-         printf "Error: Failed to obtain the required information from the server!"
-         printf "Connection Fail!"
-         printf ""
+         echo ""
+         echo "Error: Failed to obtain the required information from the server!"
+         echo "Connection Fail!"
+         echo ""
          exit
        fi
  }
- 
+
  function step1_choose_version(){
-	  
+
    FIREFOX_STABLE=`cat $TMP_FILE_STABLE`
    FIREFOX_BETA=`cat $TMP_FILE_BETA`
    FIREFOX_ESR=`cat $TMP_FILE_ESR`
    DEFAULT=`cat $TMP_FILE_STABLE`
-	  
+
    clear
-   printf ""
-   printf "[ Step 1/5 (Version) ]"
-   printf ""
-   printf "Available Versions:"
-   printf ""
-   printf "(1) - firefox-$FIREFOX_ESR (ESR)"
-   printf "(2) - firefox-$FIREFOX_STABLE (stable)"
-   printf "(3) - firefox-$FIREFOX_BETA (beta)"
-   printf ""
-   printf "(q) - quit"
-   printf ""
-   printf -n "(Default: firefox-$DEFAULT) Choose an option; " ; read VER
-   
+   echo ""
+   echo "[ Step 1/5 (Version) ]"
+   echo ""
+   echo "Available Versions:"
+   echo ""
+   echo "(1) - firefox-$FIREFOX_ESR (ESR)"
+   echo "(2) - firefox-$FIREFOX_STABLE (stable)"
+   echo "(3) - firefox-$FIREFOX_BETA (beta)"
+   echo ""
+   echo "(q) - quit"
+   echo ""
+   echo -n "(Default: firefox-$DEFAULT) Choose an option; " ; read VER
+
    if [ "$VER" == "1" -o "$VER" == "ESR" ] ; then
    VERSION=$FIREFOX_ESR
    RELEASE="latest-esr"
    step2_choose_language
-   
+
    elif [ "$VER" == "2" -o "$VER" == "stable" ] ; then
    VERSION=$FIREFOX_STABLE
    RELEASE="latest"
    step2_choose_language
-   
+
    elif [ "$VER" == "3" -o "$VER" == "beta" ] ; then
    VERSION=$FIREFOX_BETA
    RELEASE="latest-beta"
    step2_choose_language
-   
+
    elif [ "${VER:-NO_VALUE}" == "NO_VALUE" ] ; then
    VERSION=$DEFAULT
    RELEASE="latest"
    step2_choose_language
-   
+
    elif [ "$VER" == "q" -o "$VER" == "quit" ] ; then
          exit
-   
+
    else
-     clear  
-     printf ""
-     printf "Invalid option, please, choose any available version"
-     printf ""
-     printf "Press 'ENTER' to return"
+     clear
+     echo ""
+     echo "Invalid option, please, choose any available version"
+     echo ""
+     echo -n "Press 'ENTER' to return "
      read notversion
      step1_choose_version
    fi
