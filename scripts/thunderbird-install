@@ -2,9 +2,9 @@
  
 # Script to install Thunderbird on GNU/Linux
 # Created by clamsawd (clamsawd@openmailbox.org)
-# Version 2.1
+# Version 2.2
 # Licensed by GPL v.2
-# Last update: 14-10-2015
+# Last update: 26-10-2015
 # --------------------------------------
 
 # Check if 'user' is 'root'
@@ -441,9 +441,9 @@ function check_other_installs_on_system(){
    TMP_FILE_BETA=/tmp/moz_versions_bt
    TMP_FILE_ESR=/tmp/moz_versions_esr
    HTTP_THUNDERBIRD=http://archive.mozilla.org/pub/thunderbird/releases
-      curl "$HTTP_THUNDERBIRD/latest/linux-x86_64/en-US/" | grep "tar.bz2" | cut -d "-" -f 3 | cut -d "<" -f 1 > $TMP_FILE_STABLE
-      curl "$HTTP_THUNDERBIRD/latest-beta/linux-x86_64/en-US/" | grep "tar.bz2" | cut -d "-" -f 3 | cut -d "<" -f 1 > $TMP_FILE_BETA
-      curl "$HTTP_THUNDERBIRD/latest-esr/linux-x86_64/en-US/" | grep "tar.bz2" | cut -d "-" -f 3 | cut -d "<" -f 1 > $TMP_FILE_ESR
+      curl "$HTTP_THUNDERBIRD/latest/linux-x86_64/en-US/" | grep "tar.bz2" | cut -d "-" -f 4 | cut -d "<" -f 1 | cut -d '"' -f 1 | tail -n 1 > $TMP_FILE_STABLE
+      curl "$HTTP_THUNDERBIRD/latest-beta/linux-x86_64/en-US/" | grep "tar.bz2" | cut -d "-" -f 5 | cut -d "<" -f 1 | cut -d '"' -f 1 | tail -n 1 > $TMP_FILE_BETA
+      curl "$HTTP_THUNDERBIRD/latest-esr/linux-x86_64/en-US/" | grep "tar.bz2" | cut -d "-" -f 5 | cut -d "<" -f 1 | cut -d '"' -f 1 | tail -n 1 > $TMP_FILE_ESR
        error=$?
        if [ $? -eq 0 ] ; then
          echo "OK" > /dev/null
