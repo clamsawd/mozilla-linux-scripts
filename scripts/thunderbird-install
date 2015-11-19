@@ -2,10 +2,10 @@
  
 # Script to install Thunderbird on GNU/Linux
 # Created by clamsawd (clamsawd@openmailbox.org)
-# Version 2.2
 # Licensed by GPL v.2
-# Last update: 26-10-2015
+# Last update: 19-11-2015
 # --------------------------------------
+VERSION="3.0"
 
 # Check if 'user' is 'root'
 user=$(whoami)
@@ -19,13 +19,13 @@ user=$(whoami)
 # Detect "kernel" name
 KERNEL=$(uname -s)
  if   [ $KERNEL == "Linux" ]; then
-       KERNEL=linux
+       KERNEL="linux"
  else
        echo "Unsupported OS ($KERNEL)"
        exit 0
  fi
 
- # Create Mozilla thunderbird shortcut after of install it.
+ # Create Mozilla Thunderbird shortcut after of install it.
  function create_thunderbird_icon(){
 
   echo "[Desktop Entry]" > /usr/share/applications/thunderbird.desktop
@@ -48,23 +48,19 @@ KERNEL=$(uname -s)
  }
 
  # Install thunderbird using 'tar' command and
- # initialize the 'create_THUNDERBIRD_icon' function.
+ # initialize the 'create_thunderbird_icon' function.
  function install_thunderbird(){
 
    echo ""
    echo " <-Downloading Mozilla Thunderbird->"
    cd /tmp/
-   if [ "$APP_DOWNLOAD" == "curl" ] ; then
-     $APP_DOWNLOAD $SERVER > thunderbird-$VERSION
-   else
-     $APP_DOWNLOAD $SERVER
-   fi
+   $APP_DOWNLOAD $SERVER
    echo " <-Installing Mozilla Thunderbird->"
-   tar jxvf thunderbird-$VERSION -C /opt/
+   tar jxvf $RELEASE.tar.bz2 -C /opt/
    rm -rf /usr/bin/thunderbird
    ln -s /opt/thunderbird/thunderbird /usr/bin/thunderbird
    chmod 755 -R /opt/thunderbird/
-   rm -rf /tmp/thunderbird-$VERSION
+   rm -rf /tmp/$RELEASE.tar.bz2
    create_thunderbird_icon
  }
 
@@ -73,26 +69,29 @@ KERNEL=$(uname -s)
  # the install ('install_thunderbird' function).
  function step5_install_thunderbird(){
 
- SERVER=http://archive.mozilla.org/pub/thunderbird/releases/$RELEASE/$ARCH/$LANGUAGE/thunderbird-$VERSION
+ SERVER="https://download.mozilla.org/?product=$RELEASE&os=$ARCH&lang=$LANGUAGE"
 
  clear
+ echo ""
+ echo "thunderbird-install v$VERSION"
+ echo "------------------------"
  echo ""
  echo "[Step 5/5] Check your selected installation:"
  echo ""
  echo "Install: Mozilla Thunderbird"
- echo "Package: thunderbird-$VERSION"
+ echo "Package: $RELEASE"
  echo "Language: $LANGUAGE"
- echo "Arch: $ARCH"
+ echo "Arch: $ARCH_NAME"
  echo "Directory: /opt/thunderbird/"
  echo ""
- echo "Apps: $NAME_APP (download) , tar (unpack) "
+ echo "Apps: $NAME_APP (download), tar (unpack) "
  echo ""
- echo -n "(default: y) Is correct (y/n/q); " ; read VAREND
+ echo -n "(default: y) Is correct? (y/n/q); " ; read VAREND
 
   if [ "${VAREND:-NO_VALUE}" == "NO_VALUE" -o "$VAREND" == "yes" -o "$VAREND" == "y" ] ; then
      install_thunderbird
   elif [ "$VAREND" == "no" -o "$VAREND" == "n" ] ; then
-       get_list_versions
+       step1_choose_version
 
   elif [ "$VAREND" == "q" -o "$VAREND" == "quit" ] ; then
        exit
@@ -115,23 +114,23 @@ KERNEL=$(uname -s)
 
     wget --help > /dev/null
     if [ "$?" -eq 0 ] ; then
-     WGET=Available
+     WGET="Available"
     else
-     WGET='Not available'
+     WGET="Not available"
     fi
 
     aria2c --help > /dev/null
     if [ "$?" -eq 0 ] ; then
-     ARIA2C=Available
+     ARIA2C="Available"
     else
-     ARIA2C='Not available'
+     ARIA2C="Not available"
     fi
 
     axel --help > /dev/null
     if [ "$?" -eq 0 ] ; then
-     AXEL=Available
+     AXEL="Available"
     else
-     AXEL='Not available'
+     AXEL="Not available"
     fi
   step4_choose_app_download
 }
@@ -154,10 +153,10 @@ function check_other_installs_on_system(){
 	echo -n "(Default: overwrite) Choose an option; " ; read INST
 
 	if [ "${INST:-NO_VALUE}" == "NO_VALUE" ] ; then
-	   get_list_versions
+	   step1_choose_version
 
 	elif [ "$INST" == "1" -o "$INST" == "overwrite" ] ; then
-	   get_list_versions
+	   step1_choose_version
 
 	elif [ "$INST" == "2" -o "$INST" == "uninstall" ] ; then
 
@@ -186,26 +185,9 @@ function check_other_installs_on_system(){
           check_other_installs_on_system
        fi
       else
-       get_list_versions
+       step1_choose_version
     fi
 }
-
- # Check if 'git' is installed and cancel the installation 
- # if it is not installed. Initialize the 'check_other_installs_on_system'
- # too.
- function check_curl_on_system(){
-
-    curl --help > /dev/null
-    if [ "$?" -eq 0 ] ; then
-     check_other_installs_on_system
-    else
-     clear
-     echo ""
-     echo "Error: Need 'curl' installed on your system!"
-     echo ""
-     exit
-    fi
- }
 
  # Define the variable 'APP_DOWNLOAD' and
  # initialize the 'step5_install_thunderbird'
@@ -214,6 +196,9 @@ function check_other_installs_on_system(){
 
    clear
    echo ""
+   echo "thunderbird-install v$VERSION"
+   echo "------------------------"
+   echo ""
    echo "[ Step 4/5 (App to download) ]"
    echo ""
    echo "Available apps to download:"
@@ -221,20 +206,19 @@ function check_other_installs_on_system(){
    echo "(1) - wget ($WGET)"
    echo "(2) - aria2c ($ARIA2C)"
    echo "(3) - axel ($AXEL)"
-   echo "(4) - curl (Available)"
    echo ""
    echo "(q) - quit"
    echo ""
    APP=0
-   echo -n "(Default: curl) Choose an option; " ; read APP
+   echo -n "(Default: wget) Choose an option; " ; read APP
 
-   if [ "$APP" == "1" -o "$APP" == "wget" ] ; then
+   if [ "$APP" == "1" -o "$APP" == "wget" -o "${APP:-NO_VALUE}" == "NO_VALUE" ] ; then
 
      # Check if 'wget' is available using the variable
      # defined in 'check_downloaders_on_system' function.
      if [ "$WGET" == "Available" ]; then
-         APP_DOWNLOAD='wget -c'
-         NAME_APP='wget'
+         APP_DOWNLOAD="wget -O $RELEASE.tar.bz2 -c"
+         NAME_APP="wget"
          step5_install_thunderbird
      else
      clear
@@ -251,8 +235,8 @@ function check_other_installs_on_system(){
      # Check if 'aria2c' is available using the variable
      # defined in 'check_downloaders_on_system' function.
      if [ "$ARIA2C" == "Available" ]; then
-         APP_DOWNLOAD='aria2c --check-certificate=false'
-         NAME_APP='aria2c'
+         APP_DOWNLOAD="aria2c --check-certificate=false -o $RELEASE.tar.bz2"
+         NAME_APP="aria2c"
          step5_install_thunderbird
      else
      clear
@@ -269,8 +253,8 @@ function check_other_installs_on_system(){
      # Check if 'axel' is available using the variable
      # defined in 'check_downloaders_on_system' function.
      if [ "$AXEL" == "Available" ]; then
-         APP_DOWNLOAD='axel'
-         NAME_APP='axel'
+         APP_DOWNLOAD="axel -o $RELEASE.tar.bz2"
+         NAME_APP="axel"
          step5_install_thunderbird
      else
      clear
@@ -282,20 +266,8 @@ function check_other_installs_on_system(){
      step4_choose_app_download
      fi
 
-   elif [ "$APP" == "4" -o "$APP" == "curl" ] ; then
-
-         APP_DOWNLOAD='curl'
-         NAME_APP='curl'
-         step5_install_thunderbird
-
    elif [ "$APP" == "q" -o "$APP" == "quit" ] ; then
          exit
-
-   elif [ "${APP:-NO_VALUE}" == "NO_VALUE" ] ; then
-
-         APP_DOWNLOAD='curl'
-         NAME_APP='curl'
-         step5_install_thunderbird
    else
      clear
      echo ""
@@ -313,12 +285,15 @@ function check_other_installs_on_system(){
 
    clear
    echo ""
+   echo "thunderbird-install v$VERSION"
+   echo "------------------------"
+   echo ""
    echo "[ Step 3/5 (Arch) ]"
    echo ""
    echo "Available Arch:"
    echo ""
-   echo "(1) - 32 bits (linux-i686)"
-   echo "(2) - 64 bits (linux-x86_64)"
+   echo "(1) - 32 bits (linux)"
+   echo "(2) - 64 bits (linux64)"
    echo ""
    echo "(q) - quit"
    echo ""
@@ -331,11 +306,13 @@ function check_other_installs_on_system(){
       archs=`uname -m`
       case "$archs" in
        i?86)
-         ARCH=linux-i686
+         ARCH="linux"
+         ARCH_NAME="x86"
          check_downloaders_on_system
        ;;
        x86_64)
-         ARCH=linux-x86_64
+         ARCH="linux64"
+         ARCH_NAME="x86_64"
          check_downloaders_on_system
       ;;
       *)
@@ -344,11 +321,13 @@ function check_other_installs_on_system(){
       esac
 
    elif [ "$AR" == "1" -o "$AR" == "32" ] ; then
-   ARCH=linux-i686
+   ARCH="linux"
+   ARCH_NAME="x86"
    check_downloaders_on_system
 
    elif [ "$AR" == "2" -o "$AR" == "64" ] ; then
-   ARCH=linux-x86_64
+   ARCH="linux64"
+   ARCH_NAME="x86_64"
    check_downloaders_on_system
 
    elif [ "$AR" == "q" -o "$AR" == "quit" ] ; then
@@ -371,6 +350,9 @@ function check_other_installs_on_system(){
 
    FILE_LANGUAGES=/tmp/thunderbird-languages
    clear
+   echo ""
+   echo "thunderbird-install v$VERSION"
+   echo "------------------------"
    echo ""
    echo "[ Step 2/5 (Language) ]"
    echo ""
@@ -405,7 +387,7 @@ function check_other_installs_on_system(){
 
         if [ "$LANGUAGE_VAR" == "$LANG" ]; then
 
-            LANGUAGE=$LANG
+            LANGUAGE="$LANG"
             step3_choose_arch
 
         else
@@ -428,75 +410,39 @@ function check_other_installs_on_system(){
    fi
 }
 
- # Get the list of available thunderbird versions using 'curl',
- # and initialize the 'step2_choose_language' function.
-
- function get_list_versions() {
-
-   clear
-   echo ""
-   echo "Getting information of available versions, please wait.."
-   echo ""
-   TMP_FILE_STABLE=/tmp/moz_versions_st
-   TMP_FILE_BETA=/tmp/moz_versions_bt
-   TMP_FILE_ESR=/tmp/moz_versions_esr
-   HTTP_THUNDERBIRD=http://archive.mozilla.org/pub/thunderbird/releases
-      curl "$HTTP_THUNDERBIRD/latest/linux-x86_64/en-US/" | grep "tar.bz2" | cut -d "-" -f 4 | cut -d "<" -f 1 | cut -d '"' -f 1 | tail -n 1 > $TMP_FILE_STABLE
-      curl "$HTTP_THUNDERBIRD/latest-beta/linux-x86_64/en-US/" | grep "tar.bz2" | cut -d "-" -f 5 | cut -d "<" -f 1 | cut -d '"' -f 1 | tail -n 1 > $TMP_FILE_BETA
-      curl "$HTTP_THUNDERBIRD/latest-esr/linux-x86_64/en-US/" | grep "tar.bz2" | cut -d "-" -f 5 | cut -d "<" -f 1 | cut -d '"' -f 1 | tail -n 1 > $TMP_FILE_ESR
-       error=$?
-       if [ $? -eq 0 ] ; then
-         echo "OK" > /dev/null
-         step1_choose_version
-       else
-         clear
-         echo ""
-         echo "Error: Failed to obtain the required information from the server!"
-         echo "Connection Fail!"
-         echo ""
-         exit
-       fi
- }
-
  function step1_choose_version(){
 
-   THUNDERBIRD_STABLE=`cat $TMP_FILE_STABLE`
-   THUNDERBIRD_BETA=`cat $TMP_FILE_BETA`
-   THUNDERBIRD_ESR=`cat $TMP_FILE_ESR`
-   DEFAULT=`cat $TMP_FILE_STABLE`
-
    clear
+   echo ""
+   echo "thunderbird-install v$VERSION"
+   echo "------------------------"
    echo ""
    echo "[ Step 1/5 (Version) ]"
    echo ""
    echo "Available Versions:"
    echo ""
-   echo "(1) - thunderbird-$THUNDERBIRD_ESR (ESR)"
-   echo "(2) - thunderbird-$THUNDERBIRD_STABLE (stable)"
-   echo "(3) - thunderbird-$THUNDERBIRD_BETA (beta)"
+   echo "(1) - thunderbird-esr-latest (ESR)"
+   echo "(2) - thunderbird-latest (stable)"
+   echo "(3) - thunderbird-beta-latest (beta)"
    echo ""
    echo "(q) - quit"
    echo ""
-   echo -n "(Default: thunderbird-$DEFAULT) Choose an option; " ; read VER
+   echo -n "(Default: stable) Choose an option; " ; read VER
 
    if [ "$VER" == "1" -o "$VER" == "ESR" ] ; then
-   VERSION=$THUNDERBIRD_ESR
-   RELEASE="latest-esr"
+   RELEASE="thunderbird-esr-latest"
    step2_choose_language
 
    elif [ "$VER" == "2" -o "$VER" == "stable" ] ; then
-   VERSION=$THUNDERBIRD_STABLE
-   RELEASE="latest"
+   RELEASE="thunderbird-latest"
    step2_choose_language
 
    elif [ "$VER" == "3" -o "$VER" == "beta" ] ; then
-   VERSION=$THUNDERBIRD_BETA
-   RELEASE="latest-beta"
+   RELEASE="thunderbird-beta-latest"
    step2_choose_language
 
    elif [ "${VER:-NO_VALUE}" == "NO_VALUE" ] ; then
-   VERSION=$DEFAULT
-   RELEASE="latest"
+   RELEASE="thunderbird-latest"
    step2_choose_language
 
    elif [ "$VER" == "q" -o "$VER" == "quit" ] ; then
@@ -514,4 +460,4 @@ function check_other_installs_on_system(){
 }
 
 # Initialize the first step of the installation.
-check_curl_on_system
+check_other_installs_on_system
