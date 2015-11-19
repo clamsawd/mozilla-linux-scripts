@@ -1,0 +1,15 @@
+#################################################
+# Installing mozilla-linux-scripts              #
+#################################################
+
+PREFIX=/usr
+
+install:
+	cp scripts/firefox-install $(PREFIX)/bin
+	cp scripts/thunderbird-install $(PREFIX)/bin
+	chmod +x $(PREFIX)/bin/firefox-install
+	chmod +x $(PREFIX)/bin/thunderbird-install
+	
+uninstall:
+	rm $(PREFIX)/bin/firefox-install
+	rm $(PREFIX)/bin/thunderbird-install
