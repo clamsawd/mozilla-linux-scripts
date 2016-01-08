@@ -3,9 +3,9 @@
 # Script to install Thunderbird on GNU/Linux
 # Created by clamsawd (clamsawd@openmailbox.org)
 # Licensed by GPL v.2
-# Last update: 19-11-2015
+# Last update: 08-01-2015
 # --------------------------------------
-VERSION="3.0"
+VERSION="3.0.1"
 
 # Check if 'user' is 'root'
 user=$(whoami)
@@ -28,6 +28,11 @@ KERNEL=$(uname -s)
  # Create Mozilla Thunderbird shortcut after of install it.
  function create_thunderbird_icon(){
 
+  cp -rf /opt/thunderbird/chrome/icons/default/default48.png /usr/share/icons/hicolor/16x16/apps/thunderbird.png
+  cp -rf /opt/thunderbird/chrome/icons/default/default48.png /usr/share/icons/hicolor/32x32/apps/thunderbird.png
+  cp -rf /opt/thunderbird/chrome/icons/default/default48.png /usr/share/icons/hicolor/48x48/apps/thunderbird.png
+  cp -rf /opt/thunderbird/chrome/icons/default/default48.png /usr/share/icons/hicolor/64x64/apps/thunderbird.png
+  cp -rf /opt/thunderbird/chrome/icons/default/default48.png /usr/share/icons/hicolor/128x128//apps/thunderbird.png
   echo "[Desktop Entry]" > /usr/share/applications/thunderbird.desktop
   #echo "Encoding=UTF-8" >> /usr/share/applications/thunderbird.desktop
   echo "Name=Mozilla Thunderbird" >> /usr/share/applications/thunderbird.desktop
@@ -38,7 +43,7 @@ KERNEL=$(uname -s)
   echo "Terminal=false" >> /usr/share/applications/thunderbird.desktop
   echo "X-MultipleArgs=false" >> /usr/share/applications/thunderbird.desktop
   echo "Type=Application" >> /usr/share/applications/thunderbird.desktop
-  echo "Icon=/opt/thunderbird/chrome/icons/default/default48.png" >> /usr/share/applications/thunderbird.desktop
+  echo "Icon=thunderbird" >> /usr/share/applications/thunderbird.desktop
   echo "Categories=Network;WebBrowser;" >> /usr/share/applications/thunderbird.desktop
   #echo "StartupWMClass=thunderbird-bin" >> /usr/share/applications/thunderbird.desktop
   echo "StartupNotify=true" >> /usr/share/applications/thunderbird.desktop
@@ -74,7 +79,7 @@ KERNEL=$(uname -s)
  clear
  echo ""
  echo "thunderbird-install v$VERSION"
- echo "------------------------"
+ echo "--------------------------"
  echo ""
  echo "[Step 5/5] Check your selected installation:"
  echo ""
@@ -197,7 +202,7 @@ function check_other_installs_on_system(){
    clear
    echo ""
    echo "thunderbird-install v$VERSION"
-   echo "------------------------"
+   echo "--------------------------"
    echo ""
    echo "[ Step 4/5 (App to download) ]"
    echo ""
@@ -286,7 +291,7 @@ function check_other_installs_on_system(){
    clear
    echo ""
    echo "thunderbird-install v$VERSION"
-   echo "------------------------"
+   echo "--------------------------"
    echo ""
    echo "[ Step 3/5 (Arch) ]"
    echo ""
@@ -352,7 +357,7 @@ function check_other_installs_on_system(){
    clear
    echo ""
    echo "thunderbird-install v$VERSION"
-   echo "------------------------"
+   echo "--------------------------"
    echo ""
    echo "[ Step 2/5 (Language) ]"
    echo ""
@@ -415,7 +420,7 @@ function check_other_installs_on_system(){
    clear
    echo ""
    echo "thunderbird-install v$VERSION"
-   echo "------------------------"
+   echo "--------------------------"
    echo ""
    echo "[ Step 1/5 (Version) ]"
    echo ""

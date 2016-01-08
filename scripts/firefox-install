@@ -3,9 +3,9 @@
 # Script to install Firefox on GNU/Linux
 # Created by clamsawd (clamsawd@openmailbox.org)
 # Licensed by GPL v.2
-# Last update: 19-11-2015
+# Last update: 08-01-2015
 # --------------------------------------
-VERSION="3.0"
+VERSION="3.0.1"
 
 # Check if 'user' is 'root'
 user=$(whoami)
@@ -28,6 +28,11 @@ KERNEL=$(uname -s)
  # Create Mozilla Firefox shortcut after of install it.
  function create_firefox_icon(){
 
+  cp -rf /opt/firefox/browser/icons/mozicon128.png /usr/share/icons/hicolor/16x16/apps/firefox.png
+  cp -rf /opt/firefox/browser/icons/mozicon128.png /usr/share/icons/hicolor/32x32/apps/firefox.png
+  cp -rf /opt/firefox/browser/icons/mozicon128.png /usr/share/icons/hicolor/48x48/apps/firefox.png
+  cp -rf /opt/firefox/browser/icons/mozicon128.png /usr/share/icons/hicolor/64x64/apps/firefox.png
+  cp -rf /opt/firefox/browser/icons/mozicon128.png /usr/share/icons/hicolor/128x128//apps/firefox.png
   echo "[Desktop Entry]" > /usr/share/applications/firefox.desktop
   #echo "Encoding=UTF-8" >> /usr/share/applications/firefox.desktop
   echo "Name=Mozilla Firefox" >> /usr/share/applications/firefox.desktop
@@ -38,7 +43,7 @@ KERNEL=$(uname -s)
   echo "Terminal=false" >> /usr/share/applications/firefox.desktop
   echo "X-MultipleArgs=false" >> /usr/share/applications/firefox.desktop
   echo "Type=Application" >> /usr/share/applications/firefox.desktop
-  echo "Icon=/opt/firefox/browser/icons/mozicon128.png" >> /usr/share/applications/firefox.desktop
+  echo "Icon=firefox" >> /usr/share/applications/firefox.desktop
   echo "Categories=Network;WebBrowser;" >> /usr/share/applications/firefox.desktop
   #echo "StartupWMClass=Firefox-bin" >> /usr/share/applications/firefox.desktop
   echo "StartupNotify=true" >> /usr/share/applications/firefox.desktop
@@ -74,7 +79,7 @@ KERNEL=$(uname -s)
  clear
  echo ""
  echo "firefox-install v$VERSION"
- echo "--------------------"
+ echo "----------------------"
  echo ""
  echo "[Step 5/5] Check your selected installation:"
  echo ""
@@ -197,7 +202,7 @@ function check_other_installs_on_system(){
    clear
    echo ""
    echo "firefox-install v$VERSION"
-   echo "--------------------"
+   echo "----------------------"
    echo ""
    echo "[ Step 4/5 (App to download) ]"
    echo ""
@@ -286,7 +291,7 @@ function check_other_installs_on_system(){
    clear
    echo ""
    echo "firefox-install v$VERSION"
-   echo "--------------------"
+   echo "----------------------"
    echo ""
    echo "[ Step 3/5 (Arch) ]"
    echo ""
@@ -352,7 +357,7 @@ function check_other_installs_on_system(){
    clear
    echo ""
    echo "firefox-install v$VERSION"
-   echo "--------------------"
+   echo "----------------------"
    echo ""
    echo "[ Step 2/5 (Language) ]"
    echo ""
@@ -415,7 +420,7 @@ function check_other_installs_on_system(){
    clear
    echo ""
    echo "firefox-install v$VERSION"
-   echo "--------------------"
+   echo "----------------------"
    echo ""
    echo "[ Step 1/5 (Version) ]"
    echo ""
