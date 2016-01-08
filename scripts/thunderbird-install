@@ -28,11 +28,16 @@ KERNEL=$(uname -s)
  # Create Mozilla Thunderbird shortcut after of install it.
  function create_thunderbird_icon(){
 
-  cp -rf /opt/thunderbird/chrome/icons/default/default48.png /usr/share/icons/hicolor/16x16/apps/thunderbird.png
-  cp -rf /opt/thunderbird/chrome/icons/default/default48.png /usr/share/icons/hicolor/32x32/apps/thunderbird.png
+  cp -rf /opt/thunderbird/chrome/icons/default/default16.png /usr/share/icons/hicolor/16x16/apps/thunderbird.png
+  cp -rf /opt/thunderbird/chrome/icons/default/default32.png /usr/share/icons/hicolor/32x32/apps/thunderbird.png
   cp -rf /opt/thunderbird/chrome/icons/default/default48.png /usr/share/icons/hicolor/48x48/apps/thunderbird.png
   cp -rf /opt/thunderbird/chrome/icons/default/default48.png /usr/share/icons/hicolor/64x64/apps/thunderbird.png
-  cp -rf /opt/thunderbird/chrome/icons/default/default48.png /usr/share/icons/hicolor/128x128//apps/thunderbird.png
+  cp -rf /opt/thunderbird/chrome/icons/default/default256.png /usr/share/icons/hicolor/256x256/apps/thunderbird.png
+  chmod 644 /usr/share/icons/hicolor/16x16/apps/thunderbird.png
+  chmod 644 /usr/share/icons/hicolor/32x32/apps/thunderbird.png
+  chmod 644 /usr/share/icons/hicolor/48x48/apps/thunderbird.png
+  chmod 644 /usr/share/icons/hicolor/64x64/apps/thunderbird.png
+  chmod 644 /usr/share/icons/hicolor/256x256/apps/thunderbird.png
   echo "[Desktop Entry]" > /usr/share/applications/thunderbird.desktop
   #echo "Encoding=UTF-8" >> /usr/share/applications/thunderbird.desktop
   echo "Name=Mozilla Thunderbird" >> /usr/share/applications/thunderbird.desktop
