@@ -5,7 +5,7 @@ Mozilla Linux Script Installers
 
   * **Install instructions:**
     * Open the terminal.
-    * Clone the repository: `git clone https://github.com/clamsawd/mozilla-linux-scripts.git`
+    * Clone the repository: `git clone https://github.com/q3aql/mozilla-linux-scripts.git`
     * Change directory: `cd mozilla-linux-scripts`
     * Run as root: `make -f makefile.linux`
    
