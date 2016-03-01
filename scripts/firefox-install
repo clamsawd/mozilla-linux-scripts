@@ -1,9 +1,9 @@
 #!/bin/bash
  
 # Script to install Firefox on GNU/Linux
-# Created by clamsawd (clamsawd@openmailbox.org)
+# Created by q3aql (q3aql@openmailbox.org)
 # Licensed by GPL v.2
-# Last update: 08-01-2015
+# Last update: 01-03-2016
 # --------------------------------------
 VERSION="3.0.1"
 
@@ -28,7 +28,6 @@ KERNEL=$(uname -s)
  # Create Mozilla Firefox shortcut after of install it.
  function create_firefox_icon(){
 
-  mkdir -p /usr/share/firefox/icons/
   cp -rf /opt/firefox/browser/chrome/icons/default/default16.png /usr/share/icons/hicolor/16x16/apps/firefox.png
   cp -rf /opt/firefox/browser/chrome/icons/default/default32.png /usr/share/icons/hicolor/32x32/apps/firefox.png
   cp -rf /opt/firefox/browser/chrome/icons/default/default48.png /usr/share/icons/hicolor/48x48/apps/firefox.png
